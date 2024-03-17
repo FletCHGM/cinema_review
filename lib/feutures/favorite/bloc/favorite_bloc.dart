@@ -2,7 +2,6 @@ import 'package:cinema_review/feutures/film/data/api/get_film_by_id.dart';
 import 'package:cinema_review/feutures/film/data/model/film_review_model.dart';
 import 'package:cinema_review/utils/api_manager/api_manager.dart';
 import 'package:cinema_review/utils/database/database.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
