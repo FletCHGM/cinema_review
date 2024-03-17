@@ -38,11 +38,18 @@ class DatabaseManager {
 
   Future<int> get remoteUnixtimeUpdate async {
     var db = await firestore;
+    var unixtime = 0;
     var result = await db
         .collection('films')
         .where('unixtime', isGreaterThanOrEqualTo: 0)
-        .get();
-    return int.parse(result.docs.first.data()['unixtime'].toString());
+        .get()
+        .timeout(
+          const Duration(
+            milliseconds: 600,
+          ),
+        );
+    unixtime = int.parse(result.docs.first.data()['unixtime'].toString());
+    return unixtime;
   }
 
   initDB() async {

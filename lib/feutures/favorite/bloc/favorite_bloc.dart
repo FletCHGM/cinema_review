@@ -1,6 +1,8 @@
 import 'package:cinema_review/feutures/film/data/api/get_film_by_id.dart';
 import 'package:cinema_review/feutures/film/data/model/film_review_model.dart';
+import 'package:cinema_review/utils/api_manager/api_manager.dart';
 import 'package:cinema_review/utils/database/database.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,9 +13,11 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
   FavoriteBloc() : super(FavoriteInitial()) {
     List<FilmReviewModel> films = [];
     on<GetFavoriteEvent>((event, emit) async {
-      try {
-        var local = await dataBaseManager.localUnixtimeUpdate;
-        var remote = await dataBaseManager.remoteUnixtimeUpdate;
+      final isConnected = await checkInternetConnection();
+      if (isConnected) {
+        final local = await dataBaseManager.localUnixtimeUpdate;
+        final remote = await dataBaseManager.remoteUnixtimeUpdate;
+
         if (remote > local) {
           List<int> ids = await getRemoteFilms();
           await clearLocalDatabase();
@@ -29,7 +33,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
           } else {
             emit(EmptyState());
           }
-        } else if (local < remote) {
+        } else if (local > remote) {
           var result = await getLocalFilms();
           await clearRemoteDatabase();
           for (var element in result) {
@@ -49,7 +53,7 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
             emit(EmptyState());
           }
         }
-      } on Exception catch (_) {
+      } else {
         var result = await getLocalFilms();
         films = result;
         if (result.isNotEmpty) {
